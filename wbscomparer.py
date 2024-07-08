@@ -5,10 +5,10 @@ import argparse
 import os
 import time
 
-parser = argparse.ArgumentParser(description="Compare errors and populate",
+parser = argparse.ArgumentParser(description="Compare WBS and Suoralinja directly",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-f", "--file", help="input .csv file, example, WBS.csv", required=True)
-parser.add_argument("-e", "--errors", help="file with matching errors", required=True)
+parser.add_argument("-f", "--file", help="input .csv file, example, Suoralinja.csv", required=True)
+parser.add_argument("-e", "--errors", help="file with matching errors, example WBS_LOG.csv", required=True)
 args = parser.parse_args()
 config = vars(args)
 path = args.file
@@ -24,7 +24,6 @@ WBS_FROM_FILE = 'WBS_FROM_FILE'
 OUTCOME = 'OUTCOME'
 
 ######Part1#####################################################
-# populate WBS with WON2SAP data
 start_time = time.time()
 with open(path, encoding="utf-8") as inputFile:
     input_csv_reader = csv.DictReader(inputFile, delimiter=';')   
@@ -50,23 +49,18 @@ with open(path, encoding="utf-8") as inputFile:
             with open(errors_filename, 'w', newline='', encoding="utf-8") as outputErrors:      
                 errors_csv_writer = csv.DictWriter(outputErrors, delimiter='|', fieldnames=fieldnames)
 
-#index with ProjectNumber and ResellerCode
                 dumpDict1 = {}
             
-    # fill index for full match (ProjectNumber + ResellerCode)
                 errorsLen = len(error_rows)
 
                 for rowfd in error_rows:
                     keys = list(rowfd)  
                     if (len(keys) > 0):
-                        # 4 - STATUS
-                        # if (rowfd['STATUS'] == ERROR_MATCH_NOT_FOUND):
                         new_key = (rowfd['WBS_ELEMENT'])
                         if (new_key in dumpDict1):
                             dd = dumpDict1[new_key]
                             dd[rows_column].append(rowfd)
                         
-                        # rowfd[1] - CONTRACT_NUMBER, rowfd[2] - , rowfd[3] - RESELLER_CODE
                         else:
                             val = { rows_column: [rowfd] }
                             dumpDict1[new_key] = val
@@ -76,8 +70,7 @@ with open(path, encoding="utf-8") as inputFile:
                 dumpDict2 = {}
                 for row in input_rows:
                     keys = list(row)
-                    if (len(keys) > 0):                    
-                        # rowfd[21] - CONTRACT_NUMBER, rowfd[23] - PRODUCTION_NUMBER, rowfd[1] - RESELLER_CODE
+                    if (len(keys) > 0):
                         dumpDict2[(row['WBS_Nr'])] = row
                    
                 dumpDict3 = {}
@@ -143,21 +136,6 @@ with open(path, encoding="utf-8") as inputFile:
                 
                 errors_csv_writer.writeheader()
                 errors_csv_writer.writerows(error_rows)
-                        
-                    
-                    
-                
-    # counters for fillings
-                # ref23_fill = 0
-                # ref2_fill = 0
-                # no_fill = 0
-                # rows = list(input_csv_reader)
-                # for row in rows:
-
-                
-                    
-                #     output_csv_writer.writerow(newrow)
-
 
 print("--- Matches:  %s, Multiple matches %s" % (match_count, multi_match_count))
 ######Part2########################################

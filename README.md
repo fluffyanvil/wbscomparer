@@ -1,1 +1,1 @@
-# wbscomparer
+wbscomparer.py -f "Suoralinja_3897370016763_20240702105423_mod.csv" -e "WBS_LOG 5th July.csv"
